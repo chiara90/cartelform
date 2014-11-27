@@ -1,0 +1,23 @@
+globals [
+  demand 
+  product_list
+  ni
+  mi
+  best_producer
+  act_B
+  P_small_shape
+  P_medium_shape
+  P_large_shape
+  y_cor
+  m_profit
+  mc_list
+  min_mc
+]
+
+to Parameters_init
+  set P_small_shape 10 
+  set P_medium_shape 20
+  set P_large_shape 30
+  
+
+end
