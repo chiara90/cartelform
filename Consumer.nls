@@ -14,7 +14,6 @@ consumers-own
   reservation_price
   purchase
   greed
-  parametro
 ]
 
 to setup-consumers
