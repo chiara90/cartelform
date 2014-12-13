@@ -1,0 +1,30 @@
+globals [fake0]
+
+to Producer_i_setup
+  ask producers[
+    set fake0 10
+    set size 20
+    set shape "factory"
+    setxy (setX name) (setY price)
+  ]
+end
+
+to Producer_i_update
+   ask producers[
+     set label quantity_left
+     setxy (setX name) (setY price)
+     if ticks > 20 and ticks < 50 [
+       set size size + equity / max_equity
+     ]
+     
+   ]
+end
+
+to-report setY [p]
+  report max-pycor / 100 * p 
+end
+
+to-report setX [n]
+      let x_cor round( max-pxcor / (HowManyProducers + 1))
+      report (fake0  + n * x_cor)
+end

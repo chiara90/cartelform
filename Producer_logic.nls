@@ -25,7 +25,6 @@ producers-own [
   innovation_post
   incentive
   equity
-  x_cor
 ]
 
 
@@ -36,9 +35,9 @@ to NewTechnology
   ; I compute the incentives to innovate for each firm
  
   ask producers[
-    if marginal_cost > 1[
-     set efficiency_post efficiency + (Technologycost / 100)
-     set innovation_post innovation + (Technologycost / 200)
+    if marginal_cost > P_minimum_marginal_cost[
+     set efficiency_post efficiency + (Technologycost / P_efficiency_base_cost)
+     set innovation_post innovation + (Technologycost / P_innovation_base_cost)
      set mc_post quality_product + innovation_post + advertising - efficiency_post 
      ]
      if quantity_left > 0 [
@@ -185,40 +184,35 @@ to Producer_new_tick
   ]
 end
 
-to grow
+to Producer_grow
   ask producers[
-    if ticks > 20 and ticks < 50 [
-     set size size + equity / max_equity
-     ]
     if ticks > 50 [  
       if size >= 40 [
-         if maxcapacity < (0.6 * Demand) / (count producers with [size >= 40])[
-           set maxcapacity maxcapacity + random (5)
-           set advertising advertising + 0.4
-           set innovation innovation + 0.4
-           set efficiency efficiency + 0.6]
-             if quality_product >= 2[
-              set quality_product  quality_product - 0.4
-              ]
-             ]
-         ]
-         ]
-         
-    
-      
-    
-  
+        if maxcapacity < (0.6 * Demand) / (count producers with [size >= 40])[
+          set maxcapacity maxcapacity + random (5)
+          set advertising advertising + 0.4
+          set innovation innovation + 0.4
+          set efficiency efficiency + 0.6
+        ]
+        if quality_product >= 2[
+          set quality_product  quality_product - 0.4
+        ]
+      ]
+    ]
+  ]
 end
+
 to Producer_setup  
   create-producers HowManyProducers 
   set demand HowManyConsumers?
   set mi 0
-  ask producers [
-    
+  set product_list []
+  ask producers [    
     set profit 0
     set equity profit
     set MaxCapacity round (Demand / (HowManyProducers)) + 0.05 * Demand
       
+    ;type "Capacity for " show capacity
     ;; -----------------------------------
     ;; MODEL FIRMS' HETEOROGENEITY:
     ;; - different marginal costs
@@ -238,34 +232,34 @@ to Producer_setup
         set quality_product random-normal quality_mean quality_SD 
         set efficiency random-normal efficiency_mean efficiency_SD
         if efficiency > (innovation + advertising + quality_product )[
-          set efficiency (innovation + advertising + quality_product - 1) 
-        ]
+          set efficiency (innovation + advertising + quality_product - 1) ]
         set marginal_cost innovation + advertising + quality_product - efficiency              
         set price (marginal_cost +  random (20)) 
         set price_list []
         set price_list lput price price_list
         set max_price max price_list
         
-        set mc_list []
-        set mc_list lput marginal_cost mc_list
-        set min_mc min mc_list
+        ;type "Price" show price
+        
+
+    set mc_list []
+    set mc_list lput marginal_cost mc_list
+    set min_mc min mc_list
        
-        set product_list []
-        set product_list lput self product_list
+    set product_list lput self product_list
     
-        set name mi
-        set mi mi + 1
-        setxy (setX name) (setY price)
-     ]
-end
-
-to-report setY [p]
-  report max-pycor / 100 * p 
-end
-
-to-report setX [n]
-      set x_cor round( max-pxcor / (HowManyProducers + 1))
-      report (fake0  + n * x_cor)
+;    let BigPro []
+;    set BigPro filter [[kind] of ? = 1] product_list
+;    ;type "Big_pro" print bigPro
+;    
+;    set Bi 1
+;    foreach BigPro[
+;      set nameBig Bi + (SmallProducers)
+;      set Bi Bi + 1]
+;   
+      set name mi
+      set mi mi + 1
+]
 end
 
 

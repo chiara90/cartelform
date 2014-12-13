@@ -5,11 +5,13 @@ globals [
   max_price
   ni
   mi
-  best_producer
   act_B
   P_small_shape
   P_medium_shape
   P_large_shape
+  P_efficiency_base_cost
+  P_innovation_base_cost
+  P_minimum_marginal_cost
   y_cor
   m_profit
   mc_list
@@ -22,6 +24,7 @@ to Parameters_init
   set P_small_shape 10 
   set P_medium_shape 20
   set P_large_shape 30
-  
-
+  set P_efficiency_base_cost 100
+  set P_innovation_base_cost 200
+  set P_minimum_marginal_cost 1
 end

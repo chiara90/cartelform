@@ -1,4 +1,4 @@
-__includes ["Parameters.nls" "Producer.nls" "IProducer.nls" "Consumer.nls"  ]
+__includes ["Parameters.nls" "Producer_logic.nls" "Producer_interface.nls" "Consumer_logic.nls" "Consumer_interface.nls"  ]
 
 
 
@@ -6,8 +6,9 @@ to setup
   clear-all
   Parameters_init
   Producer_setup
-  setup_iprod
-  setup-consumers
+  Producer_i_setup
+  Consumer_setup
+  Consumer_i_setup
   reset-ticks 
 end
 
@@ -15,15 +16,11 @@ to go
  clear-links
  Producer_new_tick
  find_best_producer
+ Consumer_i_update
  Producer_calc_new_profit
  Producer_price_correction
- grow
- ask producers[
-   set label quantity_left
-   setxy (setX name) (setY price)]
-
-;   
-; ]
+ Producer_grow
+ Producer_i_update
  tick
 end
 to invest
