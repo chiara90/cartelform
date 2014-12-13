@@ -1,0 +1,6 @@
+to setup_iprod
+  ask producers[
+   
+    set size 20
+    set shape "factory"]
+end
