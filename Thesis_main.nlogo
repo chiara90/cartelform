@@ -19,8 +19,10 @@ to go
  Consumer_i_update
  Producer_calc_new_profit
  Producer_price_correction
- Producer_grow
  Producer_i_update
+ Producer_growth
+ ;Revise_reservation_price
+ 
  tick
 end
 to invest
@@ -136,7 +138,7 @@ HowManyProducers
 HowManyProducers
 0
 30
-10
+13
 1
 1
 NIL
@@ -226,7 +228,7 @@ INPUTBOX
 244
 278
 Quality_SD
-7
+3
 1
 0
 Number
@@ -237,7 +239,7 @@ INPUTBOX
 244
 338
 Innovation_SD
-5
+3
 1
 0
 Number
@@ -248,7 +250,7 @@ INPUTBOX
 244
 397
 Advertising_SD
-5
+3
 1
 0
 Number
@@ -269,7 +271,7 @@ INPUTBOX
 139
 457
 Efficiency_mean
-5
+7
 1
 0
 Number
@@ -280,7 +282,7 @@ INPUTBOX
 244
 457
 Efficiency_SD
-2
+3
 1
 0
 Number

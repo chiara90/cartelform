@@ -1,9 +1,9 @@
 breed [producers producer]
 
 producers-own [
-  name ; name of the producer
-  kind ; difference between bigProducer [1] and smallProducer [-1]
-  MaxCapacity ;
+  name 
+  kind
+  MaxCapacity 
   marginal_cost
   quality_product
   innovation
@@ -25,182 +25,8 @@ producers-own [
   innovation_post
   incentive
   equity
-]
-
-
-
-to NewTechnology
-  ; I compute the new marginal cost after the innovation {mc_post}
-  ; Each firm forecasts the market share {random(quantity_left)} It could gain from reducing its price 
-  ; I compute the incentives to innovate for each firm
  
-  ask producers[
-    if marginal_cost > P_minimum_marginal_cost[
-     set efficiency_post efficiency + (Technologycost / P_efficiency_base_cost)
-     set innovation_post innovation + (Technologycost / P_innovation_base_cost)
-     set mc_post quality_product + innovation_post + advertising - efficiency_post 
-     ]
-     if quantity_left > 0 [
-       set quantity_sold quantity_sold + random (quantity_left)                 
-       set profit_post (price - mc_post) * quantity_sold
-       ;type "Profit Post" show profit_post
-       ;type "Profit Ante" show profit
-       ifelse profit_post != 0 [
-       set incentive (profit_post - profit) / (profit_post)][                         
-       set incentive 0]
-       ;type "Incentives: "show incentive
-     ]
-     ]
-     
-     let producers_list sort producers with [quantity_left > 0]
-     let incentives_list []
-     foreach producers_list[
-       set incentives_list lput [incentive] of ?  incentives_list]   
-     type "incentives list" print incentives_list
-     let max_incentive max incentives_list
-     let maxinc []
-     let act_i 0
-     foreach incentives_list[
-       if ? = max_incentive [
-         set maxinc lput act_i maxinc]
-       set act_i act_i + 1
-     ]
-     
-     let investor_index one-of maxinc
-     let investor item investor_index producers_list
-     ;show investor
-     ask investor[
-       set marginal_cost mc_post
-       set invest? "Yes" 
-       set innovation innovation_post
-       set efficiency efficiency_post]
-       
-
-;  ask producers with [invest? = "Yes"] [show who] 
-;  type "Profit List: " print profit_list
-;  type "Max_profit: " print max_profit  
-  
-  
-;  type "Mc list: " print mc_list
-;  type "Max mc: " print max_mc
-;  show producers with [invest? = "yes"]
-
-      
-  end     
-
-to AdvertisingCampaign
-  
-   ask producers[
-      let investors_list sort producers with [quantity_left > 0]
-      set advertising_post advertising + (AdvCost / 50)
-      ;type "advertising post " show advertising_post
-      set mc_post marginal_cost + (advertising_post - advertising) * 0.6 
-      set price_post price + mc_post - marginal_cost
-      ifelse advCost <= 100 [
-      if quantity_left > 0[
-        set advertising advertising_post
-        set marginal_cost mc_post
-        set price price_post
-        show who]
-      ]
-      [if quantity_left > 0 and kind = 1 [
-          set advertising advertising_post
-          set marginal_cost mc_post
-          set price price_post
-          show who]
-      ]
-   ]
-   
-end
-
-to HumanCapital
-  ask producers[
-      set quality_product_post quality_product + (HumCapCost / 50)
-      set mc_post marginal_cost + (quality_product_post - quality_product) * 0.6 
-      set price_post price + (mc_post - marginal_cost)
-      let quality_list [] 
-      let investors_list sort producers with [quantity_left > 0]
-      foreach investors_list[
-      set quality_list lput [quality_product] of ? quality_list]
-      let max_quality max quality_list
-     let maxq []
-     let act_i 0
-     foreach quality_list[
-       if ? = max_quality [
-         set maxq lput act_i maxq]
-       set act_i act_i + 1
-     ]
-     let investor_index one-of maxq
-     let investor item investor_index investors_list
-     
-      ask investor [
-      set quality_product quality_product_post
-      set marginal_cost mc_post
-      set price price_post
-        show who]
-   
-      
-  ]
-   
-  
-end
-
-to Producer_calc_new_profit
-  ask producers[
-    ;type "Old Profit" show profit
-    set new_profit precision((price - marginal_cost) * quantity_sold)2
-    ;type "New profit " show new_profit
-    set equity equity + new_profit
-    ;type "Equity" show equity 
-    
-    set equity_list []
-    foreach product_list [
-    set equity_list lput [equity] of ? equity_list]
-    set max_equity max equity_list
-  ]
-
-  ;type "equity list" show sort equity_list
-end
-
-to Producer_price_correction
-  ask producers [
-    ;type "Old price: " type price  
-    if Quantity_left > 0 [
-      if price - 1 > marginal_cost [
-        set price price - 1
-      ]
-    ]
-    if quantity_left = 0 [
-      set price price + 1]
-    ;type " - New Price: " show price
-  ]   
-end
-
-to Producer_new_tick
-  ask producers[
-    set profit new_profit
-    set quantity_sold 0
-    set quantity_left Maxcapacity
-  ]
-end
-
-to Producer_grow
-  ask producers[
-    if ticks > 50 [  
-      if size >= 40 [
-        if maxcapacity < (0.6 * Demand) / (count producers with [size >= 40])[
-          set maxcapacity maxcapacity + random (5)
-          set advertising advertising + 0.4
-          set innovation innovation + 0.4
-          set efficiency efficiency + 0.6
-        ]
-        if quality_product >= 2[
-          set quality_product  quality_product - 0.4
-        ]
-      ]
-    ]
-  ]
-end
+]
 
 to Producer_setup  
   create-producers HowManyProducers 
@@ -210,7 +36,7 @@ to Producer_setup
   ask producers [    
     set profit 0
     set equity profit
-    set MaxCapacity round (Demand / (HowManyProducers)) + 0.05 * Demand
+    set MaxCapacity round (Demand / (HowManyProducers)) + P_capacity_surplus * demand
       
     ;type "Capacity for " show capacity
     ;; -----------------------------------
@@ -234,33 +60,192 @@ to Producer_setup
         if efficiency > (innovation + advertising + quality_product )[
           set efficiency (innovation + advertising + quality_product - 1) ]
         set marginal_cost innovation + advertising + quality_product - efficiency              
-        set price (marginal_cost +  random (20)) 
-        set price_list []
-        set price_list lput price price_list
-        set max_price max price_list
-        
-        ;type "Price" show price
-        
-
+        set price (marginal_cost + random(P_surplus_on_mc)) 
     set mc_list []
     set mc_list lput marginal_cost mc_list
-    set min_mc min mc_list
-       
+    set min_mc min mc_list        
     set product_list lput self product_list
-    
-;    let BigPro []
-;    set BigPro filter [[kind] of ? = 1] product_list
-;    ;type "Big_pro" print bigPro
-;    
-;    set Bi 1
-;    foreach BigPro[
-;      set nameBig Bi + (SmallProducers)
-;      set Bi Bi + 1]
-;   
-      set name mi
-      set mi mi + 1
+    set name mi
+    set mi mi + 1
 ]
 end
+
+to Producer_new_tick
+  ask producers[
+    set profit new_profit
+    set quantity_sold 0
+    set quantity_left Maxcapacity
+  ]
+end
+
+to Producer_price_correction
+  ask producers [
+    if quantity_left > 0 [
+      if price - 1 > marginal_cost [
+        set price price - 1
+        ]
+      ]
+    ]   
+end
+
+to Producer_calc_new_profit
+  ask producers[
+    set new_profit precision((price - marginal_cost) * quantity_sold)2
+    set equity equity + new_profit
+    set equity_list []
+    
+    foreach product_list [
+    set equity_list lput [equity] of ? equity_list]
+    set max_equity max equity_list
+  ]
+
+end
+
+to Producer_growth
+  ask producers [
+      if ticks > P_capacity_grows_at_tick [
+       ifelse size >= P_size_big [
+        if MaxCapacity <= (P_demand_for_big * demand / (count producers with [size >= P_size_big]))
+        [
+          type "ci siamo"
+          set MaxCapacity MaxCapacity + random(P_add_capacity)
+          set advertising advertising + P_add_adv_post_growth
+          set innovation innovation + P_add_inn_post_growth
+          set efficiency efficiency + P_add_eff_post_growth
+          if quality_product >= P_min_quality [
+            set quality_product  quality_product - P_lost_quality_post_growth
+            ]
+          ]
+        ][
+        set quality_product quality_product + 1
+        ]
+      ]
+    
+    
+    
+    set price_list []
+    set price_list lput price price_list
+    set max_price max price_list
+    set min_price min price_list
+    ;type "min price" show min_price
+    ;type "capacity" show MaxCapacity
+    ;type "N" show (count producers with [size >= P_size_big])
+  ]
+  
+end
+
+
+to NewTechnology
+  ; I compute the new marginal cost after the innovation {mc_post}
+  ; Each firm forecasts the market share {random(quantity_left)} It could gain from reducing its price 
+  ; I compute the incentives to innovate for each firm
+ 
+  ask producers[
+    if marginal_cost > P_minimum_marginal_cost[
+     set efficiency_post efficiency + (Technologycost / P_efficiency_base_cost)
+     set innovation_post innovation + (Technologycost / P_innovation_base_cost)
+     set mc_post quality_product + innovation_post + advertising - efficiency_post
+     ]
+    if quantity_left > 0 [
+       set quantity_sold quantity_sold + random (quantity_left)                 
+       set profit_post (price - mc_post) * quantity_sold
+       ifelse profit_post != 0 [
+       set incentive (profit_post - profit) / (profit_post)
+       ]
+       [                         
+       set incentive 0
+       ]
+       ]
+     ]
+     
+     let producers_list sort producers with [quantity_left > 0]
+     let incentives_list []
+     foreach producers_list[
+       set incentives_list lput [incentive] of ?  incentives_list
+       ]
+     let max_incentive max incentives_list
+     let maxinc []
+     let act_i 0
+     foreach incentives_list[
+       if ? = max_incentive [
+         set maxinc lput act_i maxinc
+         ]
+       set act_i act_i + 1
+       ]
+     let investor_index one-of maxinc
+     let investor item investor_index producers_list
+
+     ask investor[
+       set marginal_cost mc_post
+       set invest? "Yes" 
+       set innovation innovation_post
+       set efficiency efficiency_post
+       ]
+  end     
+
+to AdvertisingCampaign 
+   ask producers[
+      let investors_list sort producers with [quantity_left > 0]
+      set advertising_post advertising + (AdvCost / P_advertising_base_cost)
+      set mc_post marginal_cost + (advertising_post - advertising)
+      set price_post price + mc_post - marginal_cost
+      ifelse advCost <= 100 [
+      if quantity_left > 0[
+        set advertising advertising_post
+        set marginal_cost mc_post
+        set price price_post
+        show who]
+      ]
+      [if quantity_left > 0 and kind = 1 [
+          set advertising advertising_post
+          set marginal_cost mc_post
+          set price price_post
+          show who]
+      ]
+   ]
+   
+end
+
+to HumanCapital
+  ask producers[
+      set quality_product_post quality_product + (HumCapCost / P_quality_base_cost)
+      set mc_post marginal_cost + (quality_product_post - quality_product)
+      set price_post price + (mc_post - marginal_cost)
+      let quality_list [] 
+      let investors_list sort producers with [quantity_left > 0]
+      foreach investors_list[
+        set quality_list lput [quality_product] of ? quality_list
+        ]
+      let max_quality max quality_list
+      let maxq []
+      let act_i 0
+      foreach quality_list[
+        if ? = max_quality [
+          set maxq lput act_i maxq
+          ]
+       set act_i act_i + 1
+     ]
+     let investor_index one-of maxq
+     let investor item investor_index investors_list
+     
+      ask investor [
+      set quality_product quality_product_post
+      set marginal_cost mc_post
+      set price price_post
+      ]
+      ]
+   
+  
+end
+
+
+
+
+
+
+
+
+
 
 
 

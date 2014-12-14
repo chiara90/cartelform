@@ -10,14 +10,13 @@ to Producer_i_setup
 end
 
 to Producer_i_update
-   ask producers[
-     set label quantity_left
-     setxy (setX name) (setY price)
-     if ticks > 20 and ticks < 50 [
-       set size size + equity / max_equity
+  ask producers[
+    set label quantity_left
+    setxy (setX name) (setY price)
+    if ticks > P_size_grows_at_tick and ticks < P_capacity_grows_at_tick [
+     set size size + (equity / max_equity)
      ]
-     
-   ]
+  ]
 end
 
 to-report setY [p]

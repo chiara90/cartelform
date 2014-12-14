@@ -21,43 +21,30 @@ to Consumer_setup
   create-consumers HowManyConsumers? 
   set ni 0
   ask consumers [
-    set age random (90)
-    ;; edu_level can assume              
-    ;; 0 => nothing                          
-    ;; 1 => elementary school            
-    ;; 2 => primary school               
-    ;; 3 => secondary school             
-    ;; 4 => bachelor degree                  
-    ;; 5 => master degree
-    ;; professional_level can assume
-    ;; 0 => nothing
-    ;; 1 => student
-    ;; 2 => unemployed
-    ;; 3 => employed
-    ;; 4 => professionist
-    ;; 5 => manager
-    ifelse age >= 24 [
-      set educational_level 2 + random(4) 
-      set professional_level random (6)
+    set age random (P_age) 
+    
+    ifelse age >= P_class_age_4[
+      set educational_level P_edu_level_2 + random (P_edu_level_5)  
+      set professional_level random (P_pro_level_5)
     ] [ 
-      ifelse age >= 22 [ 
-        set educational_level 2 + random(3)
-        set professional_level random (5)
+      ifelse age >= P_class_age_3 [ 
+        set educational_level P_edu_level_2 + random (P_edu_level_4) 
+        set professional_level random (P_pro_level_4)
       ] [ 
-        ifelse age >= 19 [ 
-          set educational_level 2 + random(2) 
-          set professional_level random(4)
+        ifelse age >= P_class_age_2 [ 
+          set educational_level P_edu_level_2 + random (P_edu_level_3)  
+          set professional_level  random (P_pro_level_3)
         ] [ 
-          ifelse age >= 14 [ 
-            set educational_level 2 
-            set professional_level 1
+          ifelse age >= P_class_age_1 [ 
+            set educational_level P_edu_level_2
+            set professional_level P_pro_level_1
           ] [ 
-            ifelse age >= 11 [ 
-              set educational_level 1 
-              set professional_level 1
+            ifelse age >= P_class_age_0 [ 
+              set educational_level P_edu_level_1
+              set professional_level P_pro_level_1
             ] [ 
-              set educational_level 0 
-              set professional_level 0
+              set educational_level P_edu_level_0
+              set professional_level P_pro_level_0
             ]
           ]
         ]
@@ -68,18 +55,18 @@ to Consumer_setup
     ;; 1=> middle-class
     ;; 2 =>upper-class
     
-    set social_class random  (3)  
-    ifelse age > 50  [
-      set innovativeness random (1)
+    set social_class random (P_social_class)  
+    ifelse age > P_class_age_5 [
+      set innovativeness random (P_Inn_age>50)
     ] [
-      set innovativeness random (2)
+      set innovativeness random (P_Inn_age<50)
     ]
 
-    set reservation_price min_mc + professional_level * (social_class + 1) * 3 + random(30)
-    set conditioning precision (1 + random-float (3))2
-    set quality precision (1 + random-float (3))2 
-    set imitation precision (1 + random-float (3))2
-    set greed precision( 1 + random-float (3))2
+    set reservation_price min_mc + professional_level * (social_class + 1) * 3 +  random (P_res_price_surplus)
+    ;type "min price consumer" show min_price
+    set conditioning precision (1 + random-float (P_Conditioning_weight))2 
+    set quality   precision (1 + random-float (P_quality_weight))2 
+    set greed  precision( 1 + random-float (P_greed_weight))2
    
 
     set ni ni  + 1
@@ -132,6 +119,12 @@ to find_best_producer
       
   ]
 end
+
+;to revise_reservation_price
+;  ask consumers[
+;  set reservation_price min_mc + professional_level * (social_class + 1) * 3 +  random (P_res_price_surplus)
+;  ]
+;end
 
 to-report find_best_score [ts]
   let mscore max ts
