@@ -86,6 +86,7 @@ to Producer_new_tick
   let conditioning_mean 0
     let consumers0_list []
     let itself self
+    if quantity_left > 0 [
     ask consumers [
       if best_producer != itself and reservation_price >= [price] of itself[
         set consumers0_list lput self consumers0_list
@@ -100,9 +101,34 @@ to Producer_new_tick
     set innovativeness_mean innovativeness_sum / length consumers0_list
     set conditioning_mean conditioning_sum / length consumers0_list
     
-    type "quality mean" show quality_mean_c
-    type "Innovation mean" show Innovativeness_mean
-    type "Conditioning mean" show conditioning_mean
+     ifelse quality_mean >= conditioning_mean [
+      ifelse quality_mean >= innovativeness_mean [
+        if quality_product <= quality_mean + 3 * quality_SD [
+        set quality_product quality_product  + 0.2
+        ] 
+      ][
+      if innovation <= innovation_mean + 3 * innovation_SD [
+        set innovation innovation + 0.2
+      ]
+      ]
+     ] [
+     ifelse conditioning_mean >= innovativeness_mean [
+       if advertising <= advertising_mean + 3 * advertising_SD [
+       set advertising advertising + 0.2
+       ]
+     ] [
+     set innovation innovation + 0.2     ]
+     ]
+     set marginal_cost quality_product + innovation + advertising - efficiency
+    ]
+  
+    
+ 
+        
+        
+    ;type "quality mean" show quality_mean_c
+    ;type "Innovation mean" show Innovativeness_mean
+    ;type "Conditioning mean" show conditioning_mean
     
     set profit new_profit
     set quantity_sold 0
@@ -146,9 +172,9 @@ to Producer_growth
         set kind  1
       ]
     ]
-    if kind = 0 and (count producers with [kind = 1]) > 0  [
-      set quality_product quality_product + 0.1
-    ]
+;    if kind = 0 and (count producers with [kind = 1]) > 0  [
+;      set quality_product quality_product + 0.1
+;    ]
     if kind = 1 [
       set MaxCapacity MaxCapacity + random(P_add_capacity)
       set advertising advertising + P_add_adv_post_growth
