@@ -57,9 +57,9 @@ to Consumer_setup
     
     set social_class random (P_social_class)  
     ifelse age > P_class_age_5 [
-      set innovativeness random (P_Inn_age>50)
+      set innovativeness precision(1 + random-float(P_Inn_age>50))2
     ] [
-      set innovativeness random (P_Inn_age<50)
+      set innovativeness precision (1 + random (P_Inn_age<50))2
     ]
 
     set reservation_price min_mc + professional_level * (social_class + 1) * 3 +  random (P_res_price_surplus)
@@ -115,9 +115,10 @@ to find_best_producer
       
       
       set purchase 1
-      let consumer_list sort consumers
       
+      set consumer_list sort consumers
   ]
+  
 end
 
 ;to revise_reservation_price

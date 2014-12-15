@@ -76,14 +76,33 @@ to Producer_setup
 end
 
 to Producer_new_tick
+ 
   ask producers[
+  let quality_sum 0
+  let innovativeness_sum 0
+  let conditioning_sum 0
+  let quality_mean_C 0
+  let innovativeness_mean 0
+  let conditioning_mean 0
     let consumers0_list []
     let itself self
     ask consumers [
-      if best_producer != itself [
+      if best_producer != itself and reservation_price >= [price] of itself[
         set consumers0_list lput self consumers0_list
       ]
     ]
+    foreach consumers0_list [
+    set quality_sum  quality_sum + [quality] of ?
+    set innovativeness_sum innovativeness_sum + [innovativeness] of ?
+    set conditioning_sum conditioning_sum + [conditioning] of ?   
+    ]
+    set quality_mean_C quality_sum / length consumers0_list
+    set innovativeness_mean innovativeness_sum / length consumers0_list
+    set conditioning_mean conditioning_sum / length consumers0_list
+    
+    type "quality mean" show quality_mean_c
+    type "Innovation mean" show Innovativeness_mean
+    type "Conditioning mean" show conditioning_mean
     
     set profit new_profit
     set quantity_sold 0
