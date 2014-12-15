@@ -75,13 +75,13 @@ to Parameters_init
   set P_size_grows_at_tick 20
   set P_capacity_grows_at_tick 50
   set P_size_big 40 
-  set P_demand_for_big  0.6 
+  set P_demand_for_big  0.5 
   set P_add_capacity 30
   set P_add_adv_post_growth 0.4
   set P_add_inn_post_growth 0.4
   set P_add_eff_post_growth 0.6
-  set P_min_quality 2
-  set P_lost_quality_post_growth 0.6
+  set P_min_quality 1
+  set P_lost_quality_post_growth 0.4
   ;;----------------------------------
   ;;SETUP
   ;;----------------------------------
@@ -122,8 +122,8 @@ to Parameters_init
   set P_edu_level_5 4 
   set P_social_class 3 
   set P_class_age_5 50
-  set P_Inn_age>50 1
-  set P_Inn_age<50 2
+  set P_Inn_age>50 2
+  set P_Inn_age<50 3
   set P_res_price_surplus 30
   set P_Conditioning_weight 3
   set P_quality_weight 3

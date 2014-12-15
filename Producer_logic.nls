@@ -25,15 +25,19 @@ producers-own [
   innovation_post
   incentive
   equity
- 
-]
+  price_pre_growth
+  mc_post_growth
+  surplus_on_mc
+  price_post_growth
+  ]
 
 to Producer_setup  
   create-producers HowManyProducers 
   set demand HowManyConsumers?
   set mi 0
   set product_list []
-  ask producers [    
+  ask producers [ 
+    set kind 0   
     set profit 0
     set equity profit
     set MaxCapacity round (Demand / (HowManyProducers)) + P_capacity_surplus * demand
@@ -60,7 +64,8 @@ to Producer_setup
         if efficiency > (innovation + advertising + quality_product )[
           set efficiency (innovation + advertising + quality_product - 1) ]
         set marginal_cost innovation + advertising + quality_product - efficiency              
-        set price (marginal_cost + random(P_surplus_on_mc)) 
+        set surplus_on_mc random (P_surplus_on_mc)
+        set price (marginal_cost + surplus_on_mc) 
     set mc_list []
     set mc_list lput marginal_cost mc_list
     set min_mc min mc_list        
@@ -80,6 +85,9 @@ end
 
 to Producer_price_correction
   ask producers [
+    if price < marginal_cost[
+      set price  marginal_cost]
+    
     if quantity_left > 0 [
       if price - 1 > marginal_cost [
         set price price - 1
@@ -98,39 +106,51 @@ to Producer_calc_new_profit
     set equity_list lput [equity] of ? equity_list]
     set max_equity max equity_list
   ]
+  show sort-by > equity_list
 
 end
 
 to Producer_growth
   ask producers [
-      if ticks > P_capacity_grows_at_tick [
-       ifelse size >= P_size_big [
-        if MaxCapacity <= (P_demand_for_big * demand / (count producers with [size >= P_size_big]))
-        [
-          type "ci siamo"
-          set MaxCapacity MaxCapacity + random(P_add_capacity)
-          set advertising advertising + P_add_adv_post_growth
-          set innovation innovation + P_add_inn_post_growth
-          set efficiency efficiency + P_add_eff_post_growth
-          if quality_product >= P_min_quality [
-            set quality_product  quality_product - P_lost_quality_post_growth
-            ]
-          ]
-        ][
-        set quality_product quality_product + 1
-        ]
+    if ticks =  P_capacity_grows_at_tick[
+      if equity >= 0.7 * max_equity [
+        set kind  1
       ]
+    ]
+    if kind = 0 and (count producers with [kind = 1]) > 0  [
+      set quality_product quality_product + 0.1
+    ]
+    if kind = 1 [
+      set MaxCapacity MaxCapacity + random(P_add_capacity)
+      set advertising advertising + P_add_adv_post_growth
+      set innovation innovation + P_add_inn_post_growth
+      set efficiency efficiency + P_add_eff_post_growth
+      if quality_product >= P_min_quality [
+       set quality_product quality_product - P_lost_quality_post_growth
+      ]
+      let NOfkind1 count producers with [kind = 1]
+      let NOfKind2 count producers with [kind = 2]
+      let NofKind1/2 NOfKind1 + NOfKind2
+      if MaxCapacity > ((P_demand_for_big * demand) / NOfKind1/2) [
+        set kind 2
+      ]
+    ]
+    set marginal_cost advertising + quality_product + innovation - efficiency
+  ]
     
+
+;    set mc_post_growth advertising + innovation + quality_product - efficiency
+;    set price_post_growth price + (mc_post_growth - marginal_cost )
+;    set price price_post_growth
+;    set price_list []
+;    set price_list lput price price_list
+;    set max_price max price_list
+;    set min_price min price_list
     
-    
-    set price_list []
-    set price_list lput price price_list
-    set max_price max price_list
-    set min_price min price_list
     ;type "min price" show min_price
     ;type "capacity" show MaxCapacity
     ;type "N" show (count producers with [size >= P_size_big])
-  ]
+  
   
 end
 

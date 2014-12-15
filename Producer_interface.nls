@@ -1,6 +1,10 @@
 globals [fake0]
 
 to Producer_i_setup
+  ask patches [
+    set pcolor white
+    ]
+   
   ask producers[
     set fake0 10
     set size 20
@@ -13,9 +17,12 @@ to Producer_i_update
   ask producers[
     set label quantity_left
     setxy (setX name) (setY price)
-    if ticks > P_size_grows_at_tick and ticks < P_capacity_grows_at_tick [
-     set size size + (equity / max_equity)
+    if kind = 1 [
+     set size size + 0.4
      ]
+    if kind = 2[
+      set size 40
+    ]
   ]
 end
 
