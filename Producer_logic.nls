@@ -77,10 +77,20 @@ end
 
 to Producer_new_tick
   ask producers[
+    let consumers0_list []
+    let itself self
+    ask consumers [
+      if best_producer != itself [
+        set consumers0_list lput self consumers0_list
+      ]
+    ]
+    
     set profit new_profit
     set quantity_sold 0
     set quantity_left Maxcapacity
+    type name type " who doesn't choose me are: " show  length consumers0_list
   ]
+     
 end
 
 to Producer_price_correction
