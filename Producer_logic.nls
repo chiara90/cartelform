@@ -133,7 +133,7 @@ to Producer_new_tick
     set profit new_profit
     set quantity_sold 0
     set quantity_left Maxcapacity
-    type name type " who doesn't choose me are: " show  length consumers0_list
+    ;type name type " who doesn't choose me are: " show  length consumers0_list
   ]
      
 end
@@ -161,7 +161,7 @@ to Producer_calc_new_profit
     set equity_list lput [equity] of ? equity_list]
     set max_equity max equity_list
   ]
-  show sort-by > equity_list
+  ;show sort-by > equity_list
 
 end
 
