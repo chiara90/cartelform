@@ -29,6 +29,7 @@ producers-own [
   mc_post_growth
   surplus_on_mc
   price_post_growth
+  ability_mkt_research
   ]
 
 to Producer_setup  
@@ -40,6 +41,7 @@ to Producer_setup
     set kind 0   
     set profit 0
     set equity profit
+    set ability_mkt_research precision(random-float (1))2
     set MaxCapacity round (Demand / (HowManyProducers)) + P_capacity_surplus * demand
       
     ;type "Capacity for " show capacity
@@ -84,6 +86,7 @@ to Producer_new_tick
   let quality_mean_C 0
   let innovativeness_mean 0
   let conditioning_mean 0
+  let surveyed_consumers 0
     let consumers0_list []
     let itself self
     if quantity_left > 0 [
@@ -91,15 +94,18 @@ to Producer_new_tick
       if best_producer != itself and reservation_price >= [price] of itself[
         set consumers0_list lput self consumers0_list
       ]
+      
     ]
-    foreach consumers0_list [
+    set surveyed_consumers ability_mkt_research * length consumers0_list
+    foreach n-of surveyed_consumers consumers0_list [
     set quality_sum  quality_sum + [quality] of ?
     set innovativeness_sum innovativeness_sum + [innovativeness] of ?
     set conditioning_sum conditioning_sum + [conditioning] of ?   
     ]
-    set quality_mean_C quality_sum / length consumers0_list
-    set innovativeness_mean innovativeness_sum / length consumers0_list
-    set conditioning_mean conditioning_sum / length consumers0_list
+    
+    set quality_mean_C quality_sum / surveyed_consumers
+    set innovativeness_mean innovativeness_sum / surveyed_consumers
+    set conditioning_mean conditioning_sum / surveyed_consumers
     
      ifelse quality_mean >= conditioning_mean [
       ifelse quality_mean >= innovativeness_mean [
@@ -108,7 +114,9 @@ to Producer_new_tick
         ] 
       ][
       if innovation <= innovation_mean + 3 * innovation_SD [
+        if innovation_mean <= innovation_mean + 3 * innovation_SD [
         set innovation innovation + 0.2
+        ]
       ]
       ]
      ] [
@@ -133,7 +141,8 @@ to Producer_new_tick
     set profit new_profit
     set quantity_sold 0
     set quantity_left Maxcapacity
-    ;type name type " who doesn't choose me are: " show  length consumers0_list
+    type name type " who doesn't choose me are: " show  length consumers0_list
+    type "surveyed cosumers" show surveyed_consumers
   ]
      
 end
@@ -161,7 +170,7 @@ to Producer_calc_new_profit
     set equity_list lput [equity] of ? equity_list]
     set max_equity max equity_list
   ]
-  ;show sort-by > equity_list
+  show sort-by > equity_list
 
 end
 

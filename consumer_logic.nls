@@ -115,7 +115,7 @@ to find_best_producer
       
       
       set purchase 1
-      
+      let consumer_list []
       set consumer_list sort consumers
   ]
   
