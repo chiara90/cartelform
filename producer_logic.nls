@@ -84,8 +84,10 @@ to Producer_new_tick
   let innovativeness_sum 0
   let conditioning_sum 0
   let quality_mean_C 0
+  let greed_sum 0
   let innovativeness_mean 0
   let conditioning_mean 0
+  let greed_mean 0
   let surveyed_consumers 0
     let consumers0_list []
     let itself self
@@ -101,30 +103,47 @@ to Producer_new_tick
     set quality_sum  quality_sum + [quality] of ?
     set innovativeness_sum innovativeness_sum + [innovativeness] of ?
     set conditioning_sum conditioning_sum + [conditioning] of ?   
+    set greed_sum greed_sum + [greed] of ?
     ]
     
     set quality_mean_C quality_sum / surveyed_consumers
     set innovativeness_mean innovativeness_sum / surveyed_consumers
     set conditioning_mean conditioning_sum / surveyed_consumers
+    set greed_mean greed_sum /  surveyed_consumers
     
      ifelse quality_mean >= conditioning_mean [
       ifelse quality_mean >= innovativeness_mean [
+        ifelse quality_mean >= greed_mean [
         if quality_product <= quality_mean + 3 * quality_SD [
         set quality_product quality_product  + 0.2
+        ]
+        ][
+        if efficiency <= efficiency_mean + 3 * efficiency_SD [
+          set efficiency efficiency + 0.2 
+        ]
         ] 
       ][
+      ifelse innovation_mean >= greed_mean [
       if innovation <= innovation_mean + 3 * innovation_SD [
-        if innovation_mean <= innovation_mean + 3 * innovation_SD [
         set innovation innovation + 0.2
         ]
+      ][
+      if efficiency <= efficiency_mean + 3 * efficiency_SD [
+      set greed greed + 0.2
       ]
       ]
-     ] [
+      ]
+      ] [
      ifelse conditioning_mean >= innovativeness_mean [
+       ifelse conditioning_mean >= greed_mean [
        if advertising <= advertising_mean + 3 * advertising_SD [
-       set advertising advertising + 0.2
+       set advertising advertising + 0.2 ]
+       ][
+       if efficiency <= efficiency_mean + 3 * efficiency_SD [
+       set greed greed + 0.2
        ]
-     ] [
+       ]
+       ][
      set innovation innovation + 0.2     ]
      ]
      set marginal_cost quality_product + innovation + advertising - efficiency
@@ -134,9 +153,9 @@ to Producer_new_tick
  
         
         
-    ;type "quality mean" show quality_mean_c
-    ;type "Innovation mean" show Innovativeness_mean
-    ;type "Conditioning mean" show conditioning_mean
+    type "quality mean" show quality_mean_c
+    type "Innovation mean" show Innovativeness_mean
+    type "Conditioning mean" show conditioning_mean
     
     set profit new_profit
     set quantity_sold 0
