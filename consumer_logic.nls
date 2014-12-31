@@ -11,6 +11,7 @@ consumers-own
   conditioning
   imitation
   quality
+  irrationality
   reservation_price
   purchase
   greed
@@ -67,6 +68,7 @@ to Consumer_setup
     set conditioning precision (1 + random-float (P_Conditioning_weight))2 
     set quality   precision (1 + random-float (P_quality_weight))2 
     set greed  precision( 1 + random-float (P_greed_weight))2
+    set irrationality random (2)
    
 
     set ni ni  + 1
@@ -97,21 +99,28 @@ to find_best_producer
     
     foreach affordable_products [
       let delta_price (reservation_price - [price] of ?)
-      let score_price delta_price * greed
-      let score_quality [quality_product] of ? * quality
-      let score_innovation [innovation] of ? * innovativeness
-      let score_advertising [advertising] of ? * conditioning
+      let score_price delta_price * greed 
+      let score_quality [quality_product] of ? * quality 
+      let score_innovation [innovation] of ? * innovativeness 
+      let score_advertising [advertising] of ? * conditioning 
       let rank round (score_price + score_quality + score_innovation + score_advertising)
       set total_score_AP lput rank total_score_AP
 
     ]
-    
+    if irrationality = 0 [
       let best_producer_index find_best_score total_score_AP   
       set best_producer item best_producer_index affordable_products
+    ]
+    if irrationality = 1 [
+      let length_AP length affordable_products
+      set best_producer item random (length_AP) affordable_products
+    ]
       ask best_producer [
         set quantity_sold quantity_sold + 1 
         set quantity_left quantity_left - 1
       ]
+    
+    
       
       
       set purchase 1

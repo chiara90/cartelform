@@ -138,7 +138,7 @@ HowManyProducers
 HowManyProducers
 0
 30
-13
+17
 1
 1
 NIL
@@ -151,7 +151,7 @@ BUTTON
 48
 NIL
 go
-NIL
+T
 1
 T
 OBSERVER

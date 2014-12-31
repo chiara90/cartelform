@@ -30,6 +30,7 @@ producers-own [
   surplus_on_mc
   price_post_growth
   ability_mkt_research
+  
   ]
 
 to Producer_setup  
@@ -156,7 +157,7 @@ to Producer_new_tick
     type "quality mean" show quality_mean_c
     type "Innovation mean" show Innovativeness_mean
     type "Conditioning mean" show conditioning_mean
-    
+    type "greed mean" show greed_mean
     set profit new_profit
     set quantity_sold 0
     set quantity_left Maxcapacity
