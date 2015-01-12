@@ -15,7 +15,8 @@ end
 
 to Producer_i_update
   ask producers[
-    set label quantity_left
+    set label quantity_sold
+    
     set label-color black
     setxy (setX name) (setY price)
     if kind = 1 [

@@ -68,7 +68,9 @@ to Consumer_setup
     set conditioning precision (1 + random-float (P_Conditioning_weight))2 
     set quality   precision (1 + random-float (P_quality_weight))2 
     set greed  precision( 1 + random-float (P_greed_weight))2
-    set irrationality random (2)
+    let NOfIrr (%irrationality / 100) * howmanyconsumers?
+    ask n-of NOfIrr consumers  [
+    set irrationality 1]
    
 
     set ni ni  + 1
@@ -77,11 +79,17 @@ to Consumer_setup
  ]
 
 end
+to Consumer_new_tick
+ask consumers[
+  set purchase 0
+  ]
+end
 
 to find_best_producer
 
   ask consumers[
     set affordable_products filter [ [price] of ? <= reservation_price and [quantity_left] of ? > 0  ] product_list
+    ;show product_list
     if empty? affordable_products [
       set purchase 0
       stop
@@ -107,18 +115,13 @@ to find_best_producer
       set total_score_AP lput rank total_score_AP
 
     ]
-    if irrationality = 0 [
+ 
       let best_producer_index find_best_score total_score_AP   
       set best_producer item best_producer_index affordable_products
-    ]
-    if irrationality = 1 [
-      let length_AP length affordable_products
-      set best_producer item random (length_AP) affordable_products
-    ]
       ask best_producer [
         set quantity_sold quantity_sold + 1 
         set quantity_left quantity_left - 1
-      ]
+      ]   
     
     
       

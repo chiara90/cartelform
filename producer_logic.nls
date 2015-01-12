@@ -78,7 +78,7 @@ to Producer_setup
 ]
 end
 
-to Producer_new_tick
+to Producer_mkt_research
  
   ask producers[
   let quality_sum 0
@@ -89,6 +89,7 @@ to Producer_new_tick
   let innovativeness_mean 0
   let conditioning_mean 0
   let greed_mean 0
+ 
   let surveyed_consumers 0
     let consumers0_list []
     let itself self
@@ -100,69 +101,84 @@ to Producer_new_tick
       
     ]
     set surveyed_consumers ability_mkt_research * length consumers0_list
+    
     foreach n-of surveyed_consumers consumers0_list [
-    set quality_sum  quality_sum + [quality] of ?
+    set quality_sum quality_sum + [quality] of ?
     set innovativeness_sum innovativeness_sum + [innovativeness] of ?
     set conditioning_sum conditioning_sum + [conditioning] of ?   
     set greed_sum greed_sum + [greed] of ?
     ]
     
+    if surveyed_consumers > 0 [
     set quality_mean_C quality_sum / surveyed_consumers
     set innovativeness_mean innovativeness_sum / surveyed_consumers
     set conditioning_mean conditioning_sum / surveyed_consumers
     set greed_mean greed_sum /  surveyed_consumers
+    ] 
     
-     ifelse quality_mean >= conditioning_mean [
-      ifelse quality_mean >= innovativeness_mean [
-        ifelse quality_mean >= greed_mean [
-        if quality_product <= quality_mean + 3 * quality_SD [
+     ifelse quality_mean_C >= conditioning_mean [
+      ifelse quality_mean_C >= innovativeness_mean [
+        ifelse quality_mean_C >= greed_mean [
+        ifelse quality_product <= quality_mean + 3 * quality_SD [
         set quality_product quality_product  + 0.2
-        ]
+        ][stop]
         ][
-        if efficiency <= efficiency_mean + 3 * efficiency_SD [
+        ifelse efficiency <= efficiency_mean + 3 * efficiency_SD [
           set efficiency efficiency + 0.2 
         ]
+        [stop]
         ] 
       ][
       ifelse innovation_mean >= greed_mean [
-      if innovation <= innovation_mean + 3 * innovation_SD [
+      ifelse innovation <= innovation_mean + 3 * innovation_SD [
         set innovation innovation + 0.2
-        ]
+        ][
+        stop]
       ][
-      if efficiency <= efficiency_mean + 3 * efficiency_SD [
-      set greed greed + 0.2
-      ]
+      ifelse efficiency <= efficiency_mean + 3 * efficiency_SD [
+      set efficiency efficiency + 0.2
+      ][
+      stop]
       ]
       ]
       ] [
      ifelse conditioning_mean >= innovativeness_mean [
        ifelse conditioning_mean >= greed_mean [
-       if advertising <= advertising_mean + 3 * advertising_SD [
-       set advertising advertising + 0.2 ]
+       ifelse advertising <= advertising_mean + 3 * advertising_SD [
+       set advertising advertising + 0.2 
        ][
-       if efficiency <= efficiency_mean + 3 * efficiency_SD [
-       set greed greed + 0.2
-       ]
+       stop]
+       ][
+       ifelse efficiency <= efficiency_mean + 3 * efficiency_SD [
+       set efficiency efficiency + 0.2
+       ][
+       stop]
        ]
        ][
-     set innovation innovation + 0.2     ]
+       ifelse innovation <= innovation_mean + 3 * innovation_SD [
+         set innovation innovation + 0.2 
+         ][
+         stop]
      ]
+      ]
      set marginal_cost quality_product + innovation + advertising - efficiency
-    ]
-  
     
- 
-        
-        
-    type "quality mean" show quality_mean_c
-    type "Innovation mean" show Innovativeness_mean
-    type "Conditioning mean" show conditioning_mean
-    type "greed mean" show greed_mean
+    ]
+       
+    ;type "quantity left pre" show quantity_left_pre 
+    ;type "quality mean" show quality_mean_c
+    ;type "Innovation mean" show Innovativeness_mean
+    ;type "Conditioning mean" show conditioning_mean
+    ;type "greed mean" show greed_mean
+  ]
+end
+to Producer_new_tick
+  ask producers [ 
     set profit new_profit
     set quantity_sold 0
     set quantity_left Maxcapacity
-    type name type " who doesn't choose me are: " show  length consumers0_list
-    type "surveyed cosumers" show surveyed_consumers
+    ;type name type " who doesn't choose me are: " show  length consumers0_list
+    ;type "surveyed cosumers" show surveyed_consumers
   ]
      
 end
@@ -177,6 +193,7 @@ to Producer_price_correction
         set price price - 1
         ]
       ]
+    
     ]   
 end
 
@@ -185,19 +202,23 @@ to Producer_calc_new_profit
     set new_profit precision((price - marginal_cost) * quantity_sold)2
     set equity equity + new_profit
     set equity_list []
+   
+     
+    ;type "quantity left post" show quantity_left_post 
     
     foreach product_list [
     set equity_list lput [equity] of ? equity_list]
     set max_equity max equity_list
   ]
-  show sort-by > equity_list
 
+  ;show sort-by > equity_list
+  
 end
 
 to Producer_growth
   ask producers [
     if ticks =  P_capacity_grows_at_tick[
-      if equity >= 0.7 * max_equity [
+      if equity >= P_equity_proportion * max_equity [
         set kind  1
       ]
     ]
@@ -206,9 +227,15 @@ to Producer_growth
 ;    ]
     if kind = 1 [
       set MaxCapacity MaxCapacity + random(P_add_capacity)
+      if advertising < advertising_mean * advertising_SD [
       set advertising advertising + P_add_adv_post_growth
+      ]
+      if innovation < innovation_mean * innovation_SD [
       set innovation innovation + P_add_inn_post_growth
+      ]
+      if efficiency < efficiency_mean * efficiency_SD [
       set efficiency efficiency + P_add_eff_post_growth
+      ]
       if quality_product >= P_min_quality [
        set quality_product quality_product - P_lost_quality_post_growth
       ]
@@ -218,9 +245,16 @@ to Producer_growth
       if MaxCapacity > ((P_demand_for_big * demand) / NOfKind1/2) [
         set kind 2
       ]
+       set marginal_cost advertising + quality_product + innovation - efficiency
+       if marginal_cost < 0 [
+       set marginal_cost 1
+       ]
     ]
-    set marginal_cost advertising + quality_product + innovation - efficiency
+   
   ]
+end
+
+ 
     
 
 ;    set mc_post_growth advertising + innovation + quality_product - efficiency
@@ -236,7 +270,7 @@ to Producer_growth
     ;type "N" show (count producers with [size >= P_size_big])
   
   
-end
+
 
 
 to NewTechnology

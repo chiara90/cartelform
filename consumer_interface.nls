@@ -9,9 +9,11 @@ end
 
 to Consumer_i_update
   ask consumers [
-    if purchase > 0 [
-      setxy ([xcor] of best_producer - 2 + random-float(15)) ([ycor] of best_producer + 1 + random-float([quantity_sold] of best_producer / 3))
-      ]
+    ifelse purchase > 0 [
+      setxy ([xcor] of best_producer - 2 + random-float(10)) ([ycor] of best_producer + 1 + random-float([quantity_sold] of best_producer / 4 ))
+      ][
+      setxy random (600) 600
+    ]
     
       
     

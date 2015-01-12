@@ -15,13 +15,17 @@ end
 to go
  clear-links
  Producer_new_tick
+ Consumer_new_tick
  find_best_producer
+ Producer_mkt_research
  Consumer_i_update
  Producer_calc_new_profit
  Producer_price_correction
  Producer_i_update
  Producer_growth
- ;Revise_reservation_price
+
+ 
+
  
  tick
 end
@@ -71,9 +75,9 @@ end
   
 @#$#@#$#@
 GRAPHICS-WINDOW
-535
+531
 10
-1180
+1176
 676
 -1
 -1
@@ -138,7 +142,7 @@ HowManyProducers
 HowManyProducers
 0
 30
-17
+12
 1
 1
 NIL
@@ -228,7 +232,7 @@ INPUTBOX
 244
 278
 Quality_SD
-3
+2
 1
 0
 Number
@@ -239,7 +243,7 @@ INPUTBOX
 244
 338
 Innovation_SD
-3
+2
 1
 0
 Number
@@ -250,7 +254,7 @@ INPUTBOX
 244
 397
 Advertising_SD
-3
+2
 1
 0
 Number
@@ -282,7 +286,7 @@ INPUTBOX
 244
 457
 Efficiency_SD
-3
+2
 1
 0
 Number
@@ -359,6 +363,62 @@ HumCapCost
 1
 0
 Number
+
+TEXTBOX
+324
+203
+474
+221
+Consumers\n
+12
+0.0
+1
+
+INPUTBOX
+300
+219
+413
+279
+%irrationality
+5
+1
+0
+Number
+
+PLOT
+1175
+463
+2005
+924
+Distribution
+Time
+Market shares
+0.0
+0.0
+0.0
+0.0
+true
+false
+"set-plot-x-range 0 ticks + 1\nlet max_producer max-one-of producers [quantity_sold]\nset-plot-y-range 0 [quantity_sold] of max_producer +  1\nforeach product_list [\n create-temporary-plot-pen (word [name] of ?)\n set-plot-pen-color [color] of ?\n]" "set-plot-x-range 0 ticks + 1\nlet max_producer max-one-of producers [quantity_sold]\nif [quantity_sold] of max_producer > plot-y-max [\n set-plot-y-range 0 [quantity_sold] of max_producer + 1\n]\n\nforeach product_list [\n set-current-plot-pen (word [name] of ?)\n plotxy ticks [quantity_sold] of ?\n]"
+PENS
+
+PLOT
+1175
+10
+1819
+464
+plot 1
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"let max_producer max-one-of producers [quantity_sold]\nlet min_producer min-one-of producers [quantity_sold]\nset-plot-y-range 0 HowManyProducers\nset-plot-x-range [quantity_sold] of min_producer [quantity_sold] of max_producer + 1\nset-histogram-num-bars 10" "let max_producer max-one-of producers [quantity_sold]\nlet min_producer min-one-of producers [quantity_sold]\nset-plot-x-range [quantity_sold] of min_producer [quantity_sold] of max_producer + 1\nset-plot-pen-interval (plot-x-max - plot-x-min) / 10"
+PENS
+"default" 2.0 2 -16777216 true "" "histogram [quantity_sold] of producers"
 
 @#$#@#$#@
 ## WHAT IS IT?
