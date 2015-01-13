@@ -59,10 +59,8 @@ globals [
   P_quality_weight
   P_greed_weight
   P_equity_proportion
-  quantity_sold_tot
-  market_share
-  maxcapacity_post
-  maxcapacity_pre
+
+
 ]
 
 to Parameters_init
@@ -87,7 +85,7 @@ to Parameters_init
   set P_add_eff_post_growth 1
   set P_min_quality 1
   set P_lost_quality_post_growth 1
-  set P_equity_proportion 0.75
+  set P_equity_proportion 0.8
   ;;----------------------------------
   ;;SETUP
   ;;----------------------------------

@@ -30,6 +30,7 @@ producers-own [
   surplus_on_mc
   price_post_growth
   ability_mkt_research
+  maxcapacity_pre
   
   ]
 
@@ -65,7 +66,8 @@ to Producer_setup
         set quality_product random-normal quality_mean quality_SD 
         set efficiency random-normal efficiency_mean efficiency_SD
         if efficiency > (innovation + advertising + quality_product )[
-          set efficiency (innovation + advertising + quality_product - 1) ]
+          set efficiency (innovation + advertising + quality_product - 1
+            ) ]
         set marginal_cost innovation + advertising + quality_product - efficiency              
         set surplus_on_mc random (P_surplus_on_mc)
         set price (marginal_cost + surplus_on_mc) 
@@ -89,11 +91,11 @@ to Producer_mkt_research
   let innovativeness_mean 0
   let conditioning_mean 0
   let greed_mean 0
- 
+  let quantity_left_limit 0.3 * maxcapacity
   let surveyed_consumers 0
     let consumers0_list []
     let itself self
-    if quantity_left > 0 [
+    if quantity_left >= quantity_left_limit [
     ask consumers [
       if best_producer != itself and reservation_price >= [price] of itself[
         set consumers0_list lput self consumers0_list
@@ -116,10 +118,10 @@ to Producer_mkt_research
     set greed_mean greed_sum /  surveyed_consumers
     ] 
     
-    let q_n_consumer quality_mean_c / (P_quality_weight - 1)
-    let i_n_consumer innovativeness_mean / (P_Inn_age<50 - 1)
-    let c_n_consumer conditioning_mean / (P_conditioning_weight - 1)
-    let g_n_consumer greed_mean / (P_greed_weight - 1)
+    let q_n_consumer (quality_mean_c - 1) / ((P_quality_weight ) - 1)
+    let i_n_consumer (innovativeness_mean - 1) / ((P_Inn_age<50 ) - 1)
+    let c_n_consumer (conditioning_mean - 1) / ((P_conditioning_weight) - 1)
+    let g_n_consumer (greed_mean - 1) / ((P_greed_weight) - 1)
     
     let f_q floor (q_n_consumer / g_n_consumer)
     
@@ -175,6 +177,18 @@ to Producer_mkt_research
 end
 to Producer_new_tick
   ask producers [
+    set maxcapacity_pre maxcapacity
+;    let delta_capacity maxcapacity_post - maxcapacity_pre
+;    if delta_capacity > 0 [
+;      if efficiency <= advertising + innovation + quality_product [
+;    set efficiency efficiency + 0.2
+;      ]
+;    ]
+;    if delta_capacity < 0 [
+;    if efficiency > 0 [
+;    set efficiency efficiency - 0.2
+;    ]
+;    ]
     set marginal_cost quality_product + innovation + advertising - efficiency 
     set profit new_profit
     set quantity_sold 0
@@ -219,7 +233,7 @@ end
 
 to Producer_growth
   ask producers [
-    set maxcapacity_pre maxcapacity
+    
     if ticks =  P_capacity_grows_at_tick[
       if equity >= P_equity_proportion * max_equity [
         set kind  1
@@ -253,10 +267,43 @@ to Producer_growth
 ;       set marginal_cost 1
 ;       ]
     ]
-    set maxcapacity_post maxcapacity
-    type "maxcappre: " show maxcapacity_pre
-    type "maxcappost: " show maxcapacity_post
+  
    
+   
+  ]
+end
+to producer_revise_capacity
+  ask producers[
+    if kind = 0[
+    if ticks >= 100 [
+    if quantity_left >= 0.4 * maxcapacity [
+      if maxcapacity > 10 [
+      set maxcapacity maxcapacity - 1
+      ]
+    ]
+    ]
+    ]
+    type "tick" print ticks
+    type "MaxCapPre: " show maxcapacity_pre
+    type "MaxCapPost: " show maxcapacity
+    
+    if maxcapacity < maxcapacity_pre [
+      if efficiency > 0 [
+      set efficiency efficiency - 0.2
+      ]
+      if quality_product < quality_mean + 3 * quality_SD [
+      set quality_product quality_product + 0.2
+      ]
+    ]
+    
+    if maxcapacity > maxcapacity_pre [
+      if efficiency < (advertising + innovation + quality_product) [
+      set efficiency efficiency + 0.2
+      ]
+      if quality_product > 0 [
+      set quality_product quality_product - 0.2
+      ]
+    ]
   ]
 end
 

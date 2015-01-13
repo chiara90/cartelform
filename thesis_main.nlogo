@@ -23,6 +23,7 @@ to go
  Producer_price_correction
  Producer_i_update
  Producer_growth
+ Producer_revise_capacity
 
  
 
@@ -232,7 +233,7 @@ INPUTBOX
 244
 278
 Quality_SD
-2
+5
 1
 0
 Number
@@ -243,7 +244,7 @@ INPUTBOX
 244
 338
 Innovation_SD
-2
+5
 1
 0
 Number
@@ -254,7 +255,7 @@ INPUTBOX
 244
 397
 Advertising_SD
-2
+5
 1
 0
 Number
@@ -275,7 +276,7 @@ INPUTBOX
 139
 457
 Efficiency_mean
-7
+10
 1
 0
 Number
@@ -286,7 +287,7 @@ INPUTBOX
 244
 457
 Efficiency_SD
-2
+5
 1
 0
 Number
