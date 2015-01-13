@@ -59,6 +59,10 @@ globals [
   P_quality_weight
   P_greed_weight
   P_equity_proportion
+  quantity_sold_tot
+  market_share
+  maxcapacity_post
+  maxcapacity_pre
 ]
 
 to Parameters_init
